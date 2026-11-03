@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.misfinanzas.app.data.Datos
@@ -69,18 +70,14 @@ fun PantallaEtiquetas(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Etiquetas") },
+                title = { Text("Etiquetas", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onAtras) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver") }
                 },
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { creando = true },
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Nueva etiqueta") },
-            )
+            BotonSticker("Nueva etiqueta", { creando = true }, icono = Icons.Filled.Add)
         },
     ) { padding ->
         LazyColumn(
@@ -237,20 +234,21 @@ fun SelectorEtiquetas(
     var creando by remember { mutableStateOf(false) }
     Column {
         Rotulo(if (error) "Elige al menos una etiqueta" else "Etiquetas (puedes elegir varias)")
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Spacer(Modifier.size(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
             etiquetas.forEach { e ->
                 val elegida = e.id in elegidas
-                FilterChip(
-                    selected = elegida,
-                    onClick = { onCambio(if (elegida) elegidas - e.id else elegidas + e.id) },
-                    label = { Text("${e.icono}  ${e.nombre}") },
+                ChipSticker(
+                    "${e.icono}  ${e.nombre}",
+                    elegida,
+                    { onCambio(if (elegida) elegidas - e.id else elegidas + e.id) },
+                    color = Color(e.color).copy(alpha = 0.5f).compositeOver(Color.White),
                 )
             }
-            AssistChip(
-                onClick = { creando = true },
-                label = { Text("Nueva") },
-                leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp)) },
-            )
+            ChipSticker("+ Nueva", false, { creando = true })
         }
         if (error) {
             Text(

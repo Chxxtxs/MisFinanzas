@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,7 @@ import com.misfinanzas.app.data.Deuda
 import com.misfinanzas.app.data.TipoDeuda
 import com.misfinanzas.app.ui.theme.colorAFavor
 import com.misfinanzas.app.ui.theme.colorEnContra
+import com.misfinanzas.app.ui.theme.paleta
 import kotlin.math.abs
 
 @Composable
@@ -66,10 +68,11 @@ fun DetalleAmigo(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(nombre) },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onAtras) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver") }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
     ) { padding ->
@@ -79,33 +82,36 @@ fun DetalleAmigo(
         ) {
             item {
                 val (texto, color) = textoSaldo(neto)
-                Card(
-                    Modifier.fillMaxWidth().padding(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest),
-                ) {
-                    Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Insignia(nombre.take(1).uppercase(), MaterialTheme.colorScheme.primary, 56.dp)
-                        Spacer(Modifier.height(8.dp))
-                        Text(texto, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        if (abs(neto) >= 0.005) {
-                            Text(dinero(abs(neto)), style = MaterialTheme.typography.displaySmall, color = color)
+                Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Avatar(nombre, 64.dp)
+                        Spacer(Modifier.width(16.dp))
+                        Text(nombre, style = MaterialTheme.typography.headlineLarge)
+                    }
+                    Spacer(Modifier.height(20.dp))
+                    Text(texto, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (abs(neto) >= 0.005) {
+                        Text(dinero(abs(neto)), style = MaterialTheme.typography.displayMedium, color = color)
+                    }
+                    Spacer(Modifier.height(20.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        OutlinedButton(onClick = { onNueva(TipoDeuda.ME_DEBE) }, modifier = Modifier.weight(1f)) {
+                            Text("Me debe más")
                         }
-                        Spacer(Modifier.height(16.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilledTonalButton(onClick = { onNueva(TipoDeuda.ME_DEBE) }, modifier = Modifier.weight(1f)) {
-                                Text("Me debe más")
-                            }
-                            FilledTonalButton(onClick = { onNueva(TipoDeuda.LE_DEBO) }, modifier = Modifier.weight(1f)) {
-                                Text("Le debo más")
-                            }
-                        }
-                        if (pendientes.isNotEmpty()) {
-                            Spacer(Modifier.height(8.dp))
-                            Button(onClick = { confirmarSaldar = true }, modifier = Modifier.fillMaxWidth()) {
-                                Text("Saldar todo")
-                            }
+                        OutlinedButton(onClick = { onNueva(TipoDeuda.LE_DEBO) }, modifier = Modifier.weight(1f)) {
+                            Text("Le debo más")
                         }
                     }
+                    if (pendientes.isNotEmpty()) {
+                        Spacer(Modifier.height(14.dp))
+                        BotonSticker(
+                            "Saldar todo",
+                            { confirmarSaldar = true },
+                            fondo = paleta.menta,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
                 }
             }
 
@@ -148,9 +154,8 @@ fun DetalleAmigo(
 private fun Titulo(texto: String) {
     Text(
         texto,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 4.dp),
     )
 }
 
@@ -162,7 +167,7 @@ private fun FilaDeuda(deuda: Deuda, onClick: () -> Unit, onAbonar: (() -> Unit)?
         Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
@@ -171,17 +176,23 @@ private fun FilaDeuda(deuda: Deuda, onClick: () -> Unit, onAbonar: (() -> Unit)?
                 style = MaterialTheme.typography.bodyLarge,
                 textDecoration = if (deuda.saldada) TextDecoration.LineThrough else null,
             )
-            val detalle = buildString {
-                append(if (meDebe) "Me debe" else "Le debo")
-                append("  ·  ")
-                append(fechaCorta(deuda.fecha.aFecha()))
-                if (!deuda.saldada && deuda.pagado > 0.005) append("  ·  quedan ${dinero(deuda.pendiente)}")
+            val fecha = fechaCorta(deuda.fecha.aFecha()).let { if (it == "Hoy" || it == "Ayer") it.lowercase(LocaleEs) else "el $it" }
+            Text(
+                "${if (meDebe) "Me debe" else "Le debo"} desde $fecha",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (!deuda.saldada && deuda.pagado > 0.005) {
+                Text(
+                    "Ya pagó ${dinero(deuda.pagado)}, quedan ${dinero(deuda.pendiente)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = color,
+                )
             }
-            Text(detalle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(Modifier.width(8.dp))
         Column(horizontalAlignment = Alignment.End) {
-            Text(dinero(deuda.monto), fontWeight = FontWeight.SemiBold, color = color)
+            Text(dinero(deuda.monto), style = MaterialTheme.typography.titleMedium, color = color)
             if (onAbonar != null) {
                 OutlinedButton(
                     onClick = onAbonar,

@@ -102,7 +102,7 @@ fun FormGasto(
             }
         },
     ) {
-        CampoMonto(montoTxt, { montoTxt = it }, "Monto", errorMonto)
+        CampoMonto(montoTxt, { montoTxt = it }, "¿Cuánto?", errorMonto, enfocar = gasto == null)
 
         SelectorEtiquetas(
             etiquetas = etiquetas,
@@ -186,7 +186,7 @@ fun FormGasto(
                             }
                         }
 
-                        if (monto != null) {
+                        if (monto != null && sumaPartes > 0.005) {
                             val texto = if (sumaPartes > monto + 0.005) {
                                 "Las partes suman ${dinero(sumaPartes)}, más que el total."
                             } else {
@@ -234,10 +234,8 @@ fun CampoAmigo(valor: String, onCambio: (String) -> Unit, amigos: List<String>, 
         .filter { it.contains(valor.trim(), ignoreCase = true) && !it.equals(valor.trim(), ignoreCase = true) }
         .take(8)
     if (sugerencias.isNotEmpty()) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            sugerencias.forEach { nombre ->
-                FilterChip(selected = false, onClick = { onCambio(nombre) }, label = { Text(nombre) })
-            }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            sugerencias.forEach { nombre -> ChipSticker(nombre, false, { onCambio(nombre) }) }
         }
     }
 }

@@ -28,3 +28,6 @@ Guárdalos en un lugar seguro aparte (por ejemplo, un pendrive o tu Drive person
 
 ## Respaldo de datos
 Menú ⋮ → "Guardar respaldo" exporta un `.json`; "Restaurar respaldo" lo carga de vuelta (por ejemplo, en un celular nuevo).
+
+## Créditos
+Tipografía: [Bricolage Grotesque](https://github.com/ateliertriay/bricolage), licencia SIL Open Font License 1.1.

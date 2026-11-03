@@ -54,7 +54,8 @@ fun nombreMes(m: YearMonth, conAno: Boolean = true): String {
     return if (conAno) "$nombre ${m.year}" else nombre
 }
 
-private val formatoDia = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", LocaleEs)
+// Sin el mes: la lista ya está agrupada por mes.
+private val formatoDia = DateTimeFormatter.ofPattern("EEEE d", LocaleEs)
 private val formatoCorto = DateTimeFormatter.ofPattern("d MMM yyyy", LocaleEs)
 private val formatoHora = DateTimeFormatter.ofPattern("HH:mm", LocaleEs)
 

@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,6 +41,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
+import com.misfinanzas.app.ui.theme.paleta
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -148,7 +154,9 @@ private fun Inicio(vm: AppViewModel, datos: Datos, mes: YearMonth) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (vm.pestana == 0) "Mis Finanzas" else pestanas[vm.pestana].titulo) },
+                // Cada pestaña abre con su propio encabezado grande; la barra solo lleva el menú.
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 actions = {
                     IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, contentDescription = "Más opciones") }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -192,30 +200,36 @@ private fun Inicio(vm: AppViewModel, datos: Datos, mes: YearMonth) {
             )
         },
         bottomBar = {
-            NavigationBar {
+            val linea = MaterialTheme.colorScheme.outlineVariant
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.background,
+                tonalElevation = 0.dp,
+                modifier = Modifier.drawBehind {
+                    drawLine(linea, Offset(0f, 0f), Offset(size.width, 0f), strokeWidth = 2.dp.toPx())
+                },
+            ) {
                 pestanas.forEachIndexed { i, p ->
                     NavigationBarItem(
                         selected = vm.pestana == i,
                         onClick = { vm.pestana = i },
                         icon = { Icon(p.icono, contentDescription = null) },
-                        label = { Text(p.titulo) },
+                        label = { Text(p.titulo, style = MaterialTheme.typography.labelLarge) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = paleta.tinta,
+                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            indicatorColor = paleta.limon,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }
         },
         floatingActionButton = {
             if (vm.pestana == 2) {
-                ExtendedFloatingActionButton(
-                    onClick = { vm.ir(Pantalla.EditarDeuda(null)) },
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    text = { Text("Nueva deuda") },
-                )
+                BotonSticker("Anotar deuda", { vm.ir(Pantalla.EditarDeuda(null)) }, icono = Icons.Filled.Add)
             } else {
-                ExtendedFloatingActionButton(
-                    onClick = { vm.ir(Pantalla.EditarGasto(null)) },
-                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                    text = { Text("Nuevo gasto") },
-                )
+                BotonSticker("Anotar gasto", { vm.ir(Pantalla.EditarGasto(null)) }, icono = Icons.Filled.Add)
             }
         },
     ) { padding ->

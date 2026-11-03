@@ -20,8 +20,8 @@ android {
         applicationId = "com.misfinanzas.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
         // Repositorio de GitHub donde se publican las versiones (releases con el APK).
         buildConfigField("String", "REPO", "\"Chxxtxs/MisFinanzas\"")
     }
