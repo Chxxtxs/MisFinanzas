@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Billetera con un billete asomando -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFD166"
+        android:pathData="M38,42 L62,31 Q65,30 66,33 L70,42 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M38,40 H70 A6,6 0 0 1 76,46 V68 A6,6 0 0 1 70,74 H38 A6,6 0 0 1 32,68 V46 A6,6 0 0 1 38,40 Z" />
+    <path
+        android:fillColor="#FFFFD166"
+        android:pathData="M64,51 H79 V63 H64 A3,3 0 0 1 61,60 V54 A3,3 0 0 1 64,51 Z" />
+    <path
+        android:fillColor="#FF17734F"
+        android:pathData="M66,57 A2.2,2.2 0 1 0 70.4,57 A2.2,2.2 0 1 0 66,57 Z" />
+</vector>
